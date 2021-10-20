@@ -88,6 +88,9 @@ namespace ComicBookStoreAPI
             services.AddScoped<IProductImageRepository, ProductImageRepository>();
             services.AddScoped<ProductImageService>();
 
+            services.AddScoped<IProductInventoryUnitRepository, ProductInventoryUnitRepository>();
+            services.AddScoped<ProductInventoryUnitService>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ComicBookStoreAPI", Version = "v1" });

@@ -56,5 +56,7 @@ namespace ComicBookStoreAPI.Models
 
         public ICollection<ProductImage> ProductImages { get; set; }
 
+        public ICollection<ProductInventoryUnit> ProductInventoryUnits { get; set; }
+
     }
 }
