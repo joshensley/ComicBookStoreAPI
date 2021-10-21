@@ -33,6 +33,27 @@ namespace ComicBookStoreAPI.Services
             return await _productImageRepository.GetById(id, ProductImageDTO.ProductImageSelector);
         }
 
+        public async Task<ActionResult<string>> GetImageForProduct(string imageTitle)
+        {
+            var auth = new FirebaseAuthProvider(new FirebaseConfig(FirebaseKeys.apiKey));
+            var a = await auth.SignInWithEmailAndPasswordAsync(FirebaseKeys.AuthEmail, FirebaseKeys.AuthPassword);
+
+            var task = new FirebaseStorage(
+                FirebaseKeys.Bucket,
+                new FirebaseStorageOptions
+                {
+                    AuthTokenAsyncFactory = () => Task.FromResult(a.FirebaseToken),
+                    ThrowOnCancel = true
+                })
+                .Child("images")
+                .Child($"{imageTitle}")
+                .GetDownloadUrlAsync().Result;
+
+            var imageUrl = task;
+
+            return imageUrl;
+        }
+
         public async Task<ActionResult<List<ProductImageDTO>>> GetProductImages(int productId)
         {
             // Get product images by product ID

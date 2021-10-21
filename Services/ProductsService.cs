@@ -13,10 +13,14 @@ namespace ComicBookStoreAPI.Services
     public class ProductsService
     {
         public readonly IProductsRepository _productsRepository;
+        public readonly ProductImageService _productImageService;
 
-        public ProductsService(IProductsRepository productsRepository)
+        public ProductsService(
+            IProductsRepository productsRepository, 
+            ProductImageService productImageService)
         {
             _productsRepository = productsRepository;
+            _productImageService = productImageService;
         }
 
         // GET: Get all products
@@ -56,6 +60,20 @@ namespace ComicBookStoreAPI.Services
                 pageNumber: pageNumber,
                 categoryType: categoryType,
                 productType: productType);
+
+            for (int i = 0; i < products.Value.Count; i++)
+            {
+                var imageTitle = products.Value[i].ImageTitle;
+
+                if (imageTitle != null)
+                {
+                    // get the image from Firebase
+                    var imageUrl = (await _productImageService.GetImageForProduct(imageTitle)).Value;
+
+                    // get set the image in Firebase
+                    products.Value[i].ImageUrl = imageUrl;
+                }
+            }
 
 
             return products;

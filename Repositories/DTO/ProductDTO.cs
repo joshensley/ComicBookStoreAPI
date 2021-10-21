@@ -46,6 +46,15 @@ namespace ComicBookStoreAPI.Repositories.DTO
         [Display(Name = "Product Type")]
         public string ProductType { get; set; }
 
+        [Display(Name = "Image Title")]
+        public string ImageTitle { get; set; }
+
+        [Display(Name = "Image URL")]
+        public string ImageUrl { get; set; }
+
+        [Display(Name = "Inventory Stock")]
+        public int InventoryStock { get; set; }
+
         public IEnumerable<ProductSpecificationNameValue> ProductSpecificationNameValues { get; set; }
 
         public static Expression<Func<Product, ProductDTO>> ProductSelector
@@ -88,6 +97,11 @@ namespace ComicBookStoreAPI.Repositories.DTO
                     CategoryType = product.CategoryType.Name,
                     ProductTypeID = product.ProductTypeID,
                     ProductType = product.ProductType.Name,
+                    ImageTitle = product.ProductImages.First().ImageTitle,
+                    ImageUrl = "",
+                    InventoryStock = product.ProductInventoryUnits
+                        .Where(p => p.InStock == true)
+                        .Count(),
                     ProductSpecificationNameValues = product.ProductSpecificationValues
                         .Select(p => new ProductSpecificationNameValue()
                         {
