@@ -70,6 +70,9 @@ namespace ComicBookStoreAPI
                 };
             });
 
+            services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
+            services.AddScoped<ApplicationUserService>();
+
             services.AddScoped<ICategoryTypeRepository, CategoryTypeRepository>();
             services.AddScoped<CategoryTypeService>();
 
@@ -90,6 +93,9 @@ namespace ComicBookStoreAPI
 
             services.AddScoped<IProductInventoryUnitRepository, ProductInventoryUnitRepository>();
             services.AddScoped<ProductInventoryUnitService>();
+
+            services.AddScoped<ICartRepository, CartRepository>();
+            services.AddScoped<CartService>();
 
             services.AddSwaggerGen(c =>
             {

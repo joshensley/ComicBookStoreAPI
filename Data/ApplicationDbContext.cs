@@ -15,6 +15,7 @@ namespace ComicBookStoreAPI.Data
         }
 
         public DbSet<ApplicationUser> ApplicationUser { get; set; }
+        public DbSet<Cart> Cart { get; set; }
 
         public DbSet<CategoryType> CategoryType { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
