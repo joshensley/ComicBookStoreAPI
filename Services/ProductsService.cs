@@ -32,7 +32,16 @@ namespace ComicBookStoreAPI.Services
         // GET: Get product by id
         public async Task<ActionResult<ProductDTO>> GetProductByIdDTO(int id)
         {
-            return await _productsRepository.GetById(id, ProductDTO.ProductSelector);
+            var product = (await _productsRepository.GetById(id, ProductDTO.ProductWithSpecificationValuesSelector)).Value;
+
+            if (product.ImageTitle != null)
+            {
+                var imageUrl = (await _productImageService.GetImageForProduct(product.ImageTitle)).Value;
+
+                product.ImageUrl = imageUrl;
+            }
+
+            return product;
         }
 
         // GET: Get product details by id
