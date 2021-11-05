@@ -1,4 +1,6 @@
-﻿using ComicBookStoreAPI.Repositories.DTO;
+﻿using ComicBookStoreAPI.Models;
+using ComicBookStoreAPI.Models.Error;
+using ComicBookStoreAPI.Repositories.DTO;
 using ComicBookStoreAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +35,12 @@ namespace ComicBookStoreAPI.Controllers
             return await _cartService.GetApplicationUserCartDTO(applicationUserId);
         }
 
+        [HttpGet("Details/{applicationUserId}")]
+        public async Task<ActionResult<List<CartDTO>>> GetApplicationUserCartDetail(string applicationUserId)
+        {
+            return await _cartService.GetApplicationUserCartDetailDTO(applicationUserId);
+        }
+
         [HttpPost]
         public async Task<ActionResult<CartDTO>> AddProductToApplicationUserCart(int productId, string applicationUserId)
         {
@@ -54,6 +62,73 @@ namespace ComicBookStoreAPI.Controllers
             var newProductInApplicationUserCart = (await _cartService.GetProductFromApplicationUserCart(applicationUserId, productId)).Value;
 
             return newProductInApplicationUserCart;
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<List<CartDTO>>> EditProductInApplicationUserCart(int id, Cart cart)
+        {
+            if (ModelState.IsValid)
+            {
+                // matching ids
+                if (id == cart.ID)
+                {
+                    // check if requested quantity is equal to or less than 1
+                    if (cart.Quantity < 1) 
+                    {
+                        var error = new Error()
+                        {
+                            Type = "error",
+                            Description = "Product in cart must have at least 1 quantity"
+                        };
+
+                        return BadRequest(error);
+                    }
+
+                    // check if product in cart exists
+                    var cartProductExists = (await _cartService.GetCartProductByIdReturnCartModel(id)).Value;
+                    if (cartProductExists == null) 
+                    {
+                        var error = new Error()
+                        {
+                            Type = "error",
+                            Description = "Product in cart does not exist"
+                        };
+
+                        return BadRequest(error);
+                    }
+                    
+
+                    // get inventory quantity for product, and then compare inventory quantity and requested quantity
+                    var product = (await _productsService.GetProductByIdDTO(cart.ProductID)).Value;
+                    if (cart.Quantity > product.InventoryStock) {
+
+                        var error = new Error()
+                        {
+                            Type = "error",
+                            Description = $"{product.Name} has {product.InventoryStock} inventory in stock"
+                        };
+
+                        return BadRequest(error);
+                    };
+
+                    // edit the quantity of cart product
+                    var updatedCart = (await _cartService.EditProductInApplicationUserCart(cart)).Value;
+
+                    // return list CartDTO
+                    return await _cartService.GetApplicationUserCartDetailDTO(updatedCart.ApplicationUserID);
+                }
+            }
+
+            return BadRequest();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<int>> DeleteProductInApplicationUserCart(int id)
+        {
+            var product = (await _cartService.GetCartProductByIdReturnCartModel(id)).Value;
+            if (product == null) return BadRequest();
+
+            return await _cartService.DeleteProductInApplicationUserCart(product);
         }
     }
 }

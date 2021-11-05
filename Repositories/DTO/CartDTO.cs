@@ -17,6 +17,8 @@ namespace ComicBookStoreAPI.Repositories.DTO
         public decimal Price { get; set; }
         public decimal TotalPrice { get; set; }
         public string ProductTypeName { get; set; }
+        public string ImageTitle { get; set; }
+        public string ImageUrl { get; set; }
 
         public static Expression<Func<Cart, CartDTO>> CartSelector
         {
@@ -32,6 +34,26 @@ namespace ComicBookStoreAPI.Repositories.DTO
                     Price = cart.Product.RegularPrice,
                     TotalPrice = cart.Product.RegularPrice * cart.Quantity,
                     ProductTypeName = cart.Product.ProductType.Name
+                };
+            }
+        }
+
+        public static Expression<Func<Cart, CartDTO>> CartDetailSelector
+        {
+            get
+            {
+                return cart => new CartDTO()
+                {
+                    ID = cart.ID,
+                    Quantity = cart.Quantity,
+                    ApplicationUserID = cart.ApplicationUserID,
+                    ProductID = cart.ProductID,
+                    ProductName = cart.Product.Name,
+                    Price = cart.Product.RegularPrice,
+                    TotalPrice = cart.Product.RegularPrice * cart.Quantity,
+                    ProductTypeName = cart.Product.ProductType.Name,
+                    ImageTitle = cart.Product.ProductImages.First().ImageTitle,
+                    ImageUrl = ""
                 };
             }
         }

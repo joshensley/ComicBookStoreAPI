@@ -40,6 +40,22 @@ namespace ComicBookStoreAPI.Repositories
             return cart;
         }
 
+        public async Task<ActionResult<Cart>> GetCartProductByIdReturnCartModel(int id)
+        {
+            var cartProduct = await _db.Cart.AsNoTracking().FirstOrDefaultAsync(c => c.ID == id);
+            return cartProduct;
+        }
+
+        public async Task<ActionResult<List<TResult>>> GetByApplicationUserDetailsId<TResult>(Expression<Func<Cart, TResult>> selector, string applicationUserId)
+        {
+            var cart = await _db.Cart
+                .Where(c => c.ApplicationUserID == applicationUserId)
+                .Select(selector)
+                .ToListAsync();
+
+            return cart;
+        }
+
         public async Task<ActionResult<Cart>> Post(string applicationUserId, int productId)
         {
             var productCart = new Cart()
@@ -54,5 +70,22 @@ namespace ComicBookStoreAPI.Repositories
 
             return productCart;
         }
+
+        public async Task<ActionResult<Cart>> Edit(Cart cart)
+        {
+            _db.Cart.Update(cart);
+            await _db.SaveChangesAsync();
+
+            return cart;
+        }
+
+        public async Task<ActionResult<int>> Delete(Cart product)
+        {
+            _db.Cart.Remove(product);
+            await _db.SaveChangesAsync();
+
+            return product.ID;
+        }
+
     }
 }
